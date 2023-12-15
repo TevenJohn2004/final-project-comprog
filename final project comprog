@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Item {
+    char name[50];
+    float price;
+};
+
+struct Order {
+    struct Item item;
+    int quantity;
+};
+
+int main() {
+    // Tj Menu
+    const struct Item TJMenu[] = {
+        {"Sisig", 20},
+        {"Halang-Halang", 50},
+        {"odong", 35},
+        {"Utan", 30}
+        
+    };
+
+    // Maximum number of items an order can have
+    const int maxOrderItems = 10;
+
+    // Array to store orders
+    struct Order orders[maxOrderItems];
+    int numOrders = 0;
+    int choice;
+
+    while (1) {
+        displayMenu();
+
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                numOrders = placeOrder(orders, TJMenu, &numOrders);
+                break;
+            case 2:
+                viewOrders(orders, TJMenu, numOrders);
+                break;
+            case 3:
+                printf("thankyou sir.\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    }
+
+    return 0;
+}
+
+// Function to display the TJ menu
+void displayMenu() {
+    printf("\ntj kainan:\n");
+    printf("1. Place Order\n");
+    printf("2. View Orders\n");
+    printf("3. Exit\n");
+}
+
+// Function to place an order
+int placeOrder(struct Order *orders, const struct Item *menu, int *numOrders) {
+    if (*numOrders < 10) {  // Check if there is space for a new order
+        printf("\nTJ Menu:\n");
+        for (int i = 0; i < 4; i++) {
+            printf("%d. %s - P%.2f\n", i + 1, menu[i].name, menu[i].price);
+        }
+
+        int itemChoice;
+        printf("Enter the number of the item you want to order: ");
+        scanf("%d", &itemChoice);
+
+        if (itemChoice < 1 || itemChoice > 4) {
+            printf("Invalid item choice.\n");
+            return *numOrders;
+        }
+
+        int quantity;
+        printf("Enter the quantity: ");
+        scanf("%d", &quantity);
+
+        // Add the new order to the array
+        orders[*numOrders].item = menu[itemChoice - 1];
+        orders[*numOrders].quantity = quantity;
+        (*numOrders)++;
+
+        printf("Order placed successfully.\n");
+    } else {
+        printf("Maximum number of orders reached. Cannot place more orders.\n");
+    }
+
+    return *numOrders;
+}
+
+// Function to view orders and calculate the total cost
+void viewOrders(const struct Order *orders, const struct Item *menu, int numOrders) {
+    if (numOrders > 0) {
+        printf("\nOrder Details:\n");
+        printf("Item\t\tQuantity\tPrice\n");
+
+        float totalCost = 0.0;
+
+        for (int i = 0; i < numOrders; i++) {
+            float itemCost = orders[i].quantity * orders[i].item.price;
+            totalCost += itemCost;
+            printf("%s\t\t%d\t\tP%.2f\n", orders[i].item.name, orders[i].quantity, itemCost);
+        }
+
+        printf("Total Cost: P%.2f\n", totalCost);
+    } else {
+        printf("No orders placed yet.\n");
+    }
+}
